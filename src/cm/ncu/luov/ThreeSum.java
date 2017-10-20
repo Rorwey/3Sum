@@ -1,7 +1,7 @@
 package cm.ncu.luov;
 
-import cm.ncu.luov.entity.Answer;
 import cm.ncu.luov.entity.Question;
+import cm.ncu.luov.entity.ThreeTuple;
 import cm.ncu.luov.utils.FileUtils;
 import cm.ncu.luov.utils.InputUtils;
 
@@ -13,15 +13,15 @@ class ThreeSum {
     public ThreeSum() {
     }
 
-    Answer threeSumClosest(Double[] nums, Double target) {
+    List threeSumClosest(Double[] nums, Double target) {
         System.out.println("这个数组是:"+Arrays.toString(nums));
-        System.out.println("");
         Arrays.sort(nums);
         System.out.println("这个数组最大数是：" + nums[nums.length - 1] + "\t最小数是：" + nums[0] + "\t目标数是" + target);
         Double closetSum;
         Double minDiff=Double.MAX_VALUE/2;
         Double gap;
         Double sum;
+        List answer = new ArrayList();
         for (int i = 0; i < nums.length; ++i) {
             int left = i + 1, right = nums.length - 1;
             while (left < right) {
@@ -31,19 +31,24 @@ class ThreeSum {
                 if (gap < minDiff) {
                     closetSum = sum;
                     minDiff = gap;
-                    Answer ans = new Answer(nums[i], nums[left], nums[right], sum);
+                    ThreeTuple threeTuple = new ThreeTuple(nums[i], nums[left], nums[right]);
+                    answer.clear();
+                    answer.add(threeTuple);
+                } else if (Objects.equals(gap, minDiff)) {
+                    ThreeTuple threeTuple = new ThreeTuple(nums[i], nums[left], nums[right]);
+                    answer.add(threeTuple);
                 }
                 // 双指针的移动法样
-                if (sum < target) {
+                if (gap < 0) {
                     left++;
-                } else if (sum > target) {
+                } else if (gap > 0) {
                     right--;
                 } else {
-                    return ans;
+                    break;
                 }
             }
         }
-        return null;
+        return answer;
     }
     List<Question> giveQuestion() {
         while (true) {
@@ -76,13 +81,13 @@ class ThreeSum {
     }
 
     /**
-     * 系统完全随机生成
-     * @return
+     * 系统完全随机生成问题
+     * @return 问题
      */
     private Question makeQuestionWholeRandom() {
         Random random = new Random();
         Set<Double> numSet = new HashSet<>();
-        int length = random.nextInt(100) % (100 - 1 + 1) + 1;
+        int length = random.nextInt(100) % (100 - 1) + 1;
         double min = 1 + Math.random() * (100 - 1);
         double max = 1 + Math.random() * (100 - 1);
         while (true) {
@@ -92,23 +97,16 @@ class ThreeSum {
                 break;
             }
         }
-        while (numSet.size() < length) {
-            numSet.add(min + Math.random() * (max - min));
-        }
-        Object[] objects = numSet.toArray();
-        Double[] outArr = new Double[objects.length];
-        for (int i = 0; i < objects.length; i++) {
-            outArr[i] = (Double) objects[i];
-        }
         double target = 1 + Math.random() * (100 - 1);
-        return new Question(outArr, target);
+        return makeRandom(length, min, max, target);
     }
 
     /**
-     * @return
+     * 手工限制上下界和集合大小，随机生成范围内数填充集合
+     * @return 生成的问题
      */
     private Question makeQuestionRandom() {
-        Set<Double> numSet = new HashSet<>();
+
         int length = InputUtils.inputInt("请输入集合的大小：");
         Double min = InputUtils.inputDouble("请输入集合中的最小数：");
         Double max = InputUtils.inputDouble("请请输入集合中的最大数：");
@@ -119,6 +117,12 @@ class ThreeSum {
                 break;
             }
         }
+        double target = getTarget();
+        return makeRandom(length, min, max, target);
+    }
+
+    private Question makeRandom(int length, double min, double max, double target) {
+        Set<Double> numSet = new HashSet<>();
         Random random = new Random();
         while (numSet.size() < length) {
             numSet.add(min + Math.random() * (max - min));
@@ -128,11 +132,10 @@ class ThreeSum {
         for (int i = 0; i < objects.length; i++) {
             outArr[i] = (Double) objects[i];
         }
-        double target = getTarget();
         return new Question(outArr, target);
     }
 
-    private List makeQuestionFile() {
+    private List<Question> makeQuestionFile() {
         List<Question> questions = new ArrayList<>();
         Set<Double> numSet = new HashSet<>();
         File numFile = InputUtils.inputFile("输入数据文件路径：");
@@ -156,32 +159,5 @@ class ThreeSum {
         }
         return questions;
     }
-    private Double doublePointer(Double[] nums,double target){
-        Double minDiff =Double.MAX_VALUE;
-        Double gap;
-        Double sum;
-        Double closetSum;
-        for (int i = 0; i < nums.length; ++i) {
-            int left = i + 1, right = nums.length - 1;
-            while (left < right) {
-                sum = nums[i] + nums[left] + nums[right];
-                Answer ans = new Answer(i, left, right, sum);
-                // 当前组合的和与目标的差值
-                gap = Math.abs(sum - target);
-                if (gap < minDiff) {
-                    closetSum = sum;
-                    minDiff = gap;
-                }
-                // 双指针的移动法样
-                if (sum < target) {
-                    left++;
-                } else if (sum > target) {
-                    right--;
-                } else {
-                    return sum;
-                }
-            }
-        }
-        return null;
-    }
+
 }
