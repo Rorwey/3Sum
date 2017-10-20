@@ -6,6 +6,7 @@ import cm.ncu.luov.utils.FileUtils;
 import cm.ncu.luov.utils.InputUtils;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -13,8 +14,10 @@ class ThreeSum {
     public ThreeSum() {
     }
 
-    List threeSumClosest(Double[] nums, Double target) {
-        System.out.println("这个数组是:"+Arrays.toString(nums));
+    List threeSumClosest(Double[] nums, Double target, File log, int i1) {
+//        System.out.println("这个数组是:"+Arrays.toString(nums));
+        FileUtils.writeText2File("第" + i1 + "个集合是：", log, true);
+        FileUtils.writeText2File(Arrays.toString(nums), log, true);
         Arrays.sort(nums);
         System.out.println("这个数组最大数是：" + nums[nums.length - 1] + "\t最小数是：" + nums[0] + "\t目标数是" + target);
         Double closetSum;
